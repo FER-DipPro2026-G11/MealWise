@@ -1,0 +1,16 @@
+{
+    "name": "server",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch src/index.js",
+        "start": "node src/index.js",
+        "lint": "eslint ."
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.14.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^17.14.0"
+    }
+}
