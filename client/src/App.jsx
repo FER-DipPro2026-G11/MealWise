@@ -1,3 +1,13 @@
+import { Routes, Route } from "react-router";
+import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
+
 export default function App() {
-    return <h1>Hello world!</h1>;
+    return (
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
+            {/* Kad cete dodavati nove rute ovu ostavite zadnju -Dorotea */}
+        </Routes>
+    );
 }
