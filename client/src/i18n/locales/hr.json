@@ -1,0 +1,70 @@
+{
+    "common": {
+        "loading": "Učitavanje..."
+    },
+    "language": {
+        "label": "Jezik"
+    },
+    "home": {
+        "title": "Početna stranica",
+        "welcome": "Dobrodošli u MealWise, vašeg pomoćnika za planiranje obroka.",
+        "loggedInAs": "Prijavljeni ste kao {{username}}.",
+        "logout": "Odjava",
+        "login": "Prijava",
+        "register": "Registracija"
+    },
+    "auth": {
+        "username": "Korisničko ime",
+        "usernameHint": "{{min}}-{{max}} znakova: slova, brojevi i donje crte",
+        "usernameOrEmail": "Korisničko ime ili email",
+        "email": "Email",
+        "password": "Lozinka",
+        "passwordHint": "Najmanje {{min}} znakova",
+        "loginTitle": "Prijava",
+        "loginButton": "Prijavi se",
+        "loggingIn": "Prijava...",
+        "noAccount": "Nemate račun?",
+        "registerLink": "Registrirajte se",
+        "registerTitle": "Registracija",
+        "registerButton": "Registriraj se",
+        "registering": "Registracija...",
+        "haveAccount": "Već imate račun?",
+        "loginLink": "Prijavite se"
+    },
+    "avatar": {
+        "alt": "Profilna slika",
+        "upload": "Dodaj sliku",
+        "change": "Promijeni sliku",
+        "uploading": "Prijenos...",
+        "remove": "Ukloni sliku"
+    },
+    "notFound": {
+        "title": "Stranica nije pronađena",
+        "backHome": "Natrag na početnu"
+    },
+    "time": {
+        "minutes_one": "{{count}} minutu",
+        "minutes_few": "{{count}} minute",
+        "minutes_other": "{{count}} minuta"
+    },
+    "errors": {
+        "INVALID_USERNAME": "Korisničko ime mora imati {{min}}-{{max}} znakova i smije sadržavati samo slova, brojeve i donje crte.",
+        "USERNAME_TAKEN": "Korisničko ime je već zauzeto.",
+        "INVALID_EMAIL": "Unesite ispravnu email adresu.",
+        "INVALID_PASSWORD_LENGTH": "Lozinka mora imati između {{min}} i {{max}} znakova.",
+        "EMAIL_TAKEN": "Email je već registriran.",
+        "INVALID_CREDENTIALS": "Neispravno korisničko ime/email ili lozinka.",
+        "NOT_AUTHENTICATED": "Niste prijavljeni.",
+        "TOO_MANY_LOGIN_ATTEMPTS": "Previše neuspjelih pokušaja prijave. Pokušajte ponovno za $t(time.minutes, {\"count\": {{minutes}} }).",
+        "TOO_MANY_REGISTRATIONS": "Previše registracija s ove mreže. Pokušajte ponovno za $t(time.minutes, {\"count\": {{minutes}} }).",
+        "TOO_MANY_AVATAR_UPLOADS": "Previše promjena slike. Pokušajte ponovno za $t(time.minutes, {\"count\": {{minutes}} }).",
+        "IMAGE_TOO_LARGE": "Slika je prevelika. Najveća dopuštena veličina je {{maxMb}} MB.",
+        "IMAGE_DIMENSIONS_TOO_LARGE": "Rezolucija slike je prevelika. Najviše je dopušteno {{maxMegapixels}} megapiksela.",
+        "INVALID_IMAGE": "Datoteka nije podržana slika. Koristite JPEG, PNG, WebP, GIF ili AVIF.",
+        "NOT_FOUND": "Traženi resurs nije pronađen.",
+        "INVALID_REQUEST": "Neispravan zahtjev.",
+        "SERVER_ERROR": "Došlo je do greške na serveru. Pokušajte ponovno.",
+        "NETWORK_ERROR": "Nije moguće spojiti se na server. Provjerite internetsku vezu.",
+        "UNKNOWN": "Došlo je do neočekivane greške."
+    }
+}
