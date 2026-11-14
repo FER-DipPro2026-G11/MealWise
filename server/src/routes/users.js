@@ -26,33 +26,28 @@ const readImageBody = express.raw({
     limit: MAX_UPLOAD_BYTES,
 });
 
-router.put(
-    "/me/avatar",
-    requireAuth,
-    readImageBody,
-    async (req, res) => {
-        if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
-            return sendError(res, 400, "INVALID_IMAGE", "No image uploaded");
-        }
+router.put("/me/avatar", requireAuth, readImageBody, async (req, res) => {
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        return sendError(res, 400, "INVALID_IMAGE", "No image uploaded");
+    }
 
-        let image;
-        try {
-            image = await toAvatarWebp(req.body);
-        } catch (err) {
-            if (err instanceof ImageError) {
-                return sendError(res, 400, err.code, err.message, err.params);
-            }
-            throw err;
+    let image;
+    try {
+        image = await toAvatarWebp(req.body);
+    } catch (err) {
+        if (err instanceof ImageError) {
+            return sendError(res, 400, err.code, err.message, err.params);
         }
+        throw err;
+    }
 
-        await setAvatar(req.user.id, image);
-        const user = toPublicUser({ ...req.user, hasAvatar: true });
-        // The avatar URL itself stays the same, so add a one-off ?v= for the
-        // page to load the new picture instead of showing the one it has.
-        user.avatarUrl += `?v=${Date.now()}`;
-        res.json({ user });
-    },
-);
+    await setAvatar(req.user.id, image);
+    const user = toPublicUser({ ...req.user, hasAvatar: true });
+    // The avatar URL itself stays the same, so add a one-off ?v= for the
+    // page to load the new picture instead of showing the one it has.
+    user.avatarUrl += `?v=${Date.now()}`;
+    res.json({ user });
+});
 
 router.delete("/me/avatar", requireAuth, async (req, res) => {
     await setAvatar(req.user.id, null);
