@@ -17,7 +17,7 @@ function Login() {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         login.mutate({
-            email: form.get("email"),
+            login: form.get("login"),
             password: form.get("password"),
         });
     }
@@ -27,11 +27,12 @@ function Login() {
             <h1>{t("auth.loginTitle")}</h1>
             <form onSubmit={handleSubmit}>
                 <label>
-                    {t("auth.email")}
+                    {t("auth.usernameOrEmail")}
                     <input
-                        type="email"
-                        name="email"
-                        autoComplete="email"
+                        type="text"
+                        name="login"
+                        autoComplete="username"
+                        autoCapitalize="none"
                         required
                     />
                 </label>

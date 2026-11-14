@@ -8,6 +8,19 @@ export class ApiError extends Error {
     }
 }
 
+// Files (Blob/File) are sent as they are, anything else as JSON.
+function encodeBody(body) {
+    if (body === undefined) return {};
+    if (body instanceof Blob) {
+        const type = body.type || "application/octet-stream";
+        return { headers: { "Content-Type": type }, body };
+    }
+    return {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    };
+}
+
 // Thin wrapper around fetch for our own API: sends/parses JSON and turns
 // non-2xx responses into ApiError with the server's error code.
 // Used inside TanStack Query hooks, which add caching and retries on top.
@@ -16,11 +29,7 @@ export async function api(path, { method = "GET", body } = {}) {
     try {
         response = await fetch(`/api${path}`, {
             method,
-            headers:
-                body !== undefined
-                    ? { "Content-Type": "application/json" }
-                    : undefined,
-            body: body !== undefined ? JSON.stringify(body) : undefined,
+            ...encodeBody(body),
             credentials: "same-origin", // send the session cookie
         });
     } catch {

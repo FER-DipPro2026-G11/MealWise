@@ -4,35 +4,35 @@ import {
     sessionCookieOptions,
     requireAuth,
 } from "../middleware/auth.js";
-import { createUser, findUserByEmail } from "../repositories/userRepository.js";
+import { createUser, findUserByLogin } from "../repositories/userRepository.js";
 import {
     createSession,
     deleteExpiredSessions,
     deleteSession,
 } from "../repositories/sessionRepository.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
-import { normalizeEmail } from "../utils/email.js";
+import {
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH,
+    cleanText,
+    isValidEmail,
+    isValidPassword,
+    isValidUsername,
+} from "../utils/credentials.js";
 import { sendError } from "../utils/apiError.js";
+import { toPublicUser } from "../utils/user.js";
 import { loginRateLimit, registerRateLimit } from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
-const MAX_PASSWORD_LENGTH = 200;
-
-// Checked against when the email doesn't exist, so a failed login takes the
-// same time either way and doesn't reveal which emails are registered.
+// Checked against when the user doesn't exist, so a failed login takes the
+// same time either way and doesn't reveal which accounts exist.
 const DUMMY_PASSWORD_HASH = await hashPassword("timing-equalizer");
 
-function readCredentials(body) {
-    const email = normalizeEmail(body?.email);
-    const password = typeof body?.password === "string" ? body.password : "";
-    return { email, password };
-}
-
-function toPublicUser({ id, email, createdAt }) {
-    return { id, email, createdAt };
+function readPassword(body) {
+    return typeof body?.password === "string" ? body.password : "";
 }
 
 async function startSession(req, res, userId) {
@@ -43,32 +43,51 @@ async function startSession(req, res, userId) {
     });
 }
 
+// Body: { username, email, password }
 router.post("/register", registerRateLimit, async (req, res) => {
-    const { email, password } = readCredentials(req.body);
+    const username = cleanText(req.body?.username);
+    const email = cleanText(req.body?.email);
+    const password = readPassword(req.body);
 
-    if (!EMAIL_PATTERN.test(email)) {
+    if (!isValidUsername(username)) {
+        return sendError(
+            res,
+            400,
+            "INVALID_USERNAME",
+            `Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters: letters, numbers and underscores`,
+            { min: USERNAME_MIN_LENGTH, max: USERNAME_MAX_LENGTH },
+        );
+    }
+    if (!isValidEmail(email)) {
         return sendError(res, 400, "INVALID_EMAIL", "Invalid email address");
     }
-    if (
-        password.length < MIN_PASSWORD_LENGTH ||
-        password.length > MAX_PASSWORD_LENGTH
-    ) {
+    if (!isValidPassword(password)) {
         return sendError(
             res,
             400,
             "INVALID_PASSWORD_LENGTH",
-            `Password must be ${MIN_PASSWORD_LENGTH}-${MAX_PASSWORD_LENGTH} characters long`,
-            { min: MIN_PASSWORD_LENGTH, max: MAX_PASSWORD_LENGTH },
+            `Password must be ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters long`,
+            { min: PASSWORD_MIN_LENGTH, max: PASSWORD_MAX_LENGTH },
         );
     }
 
     let user;
     try {
         user = await createUser({
+            username,
             email,
             passwordHash: await hashPassword(password),
         });
     } catch (err) {
+        // Unique index violated: tell the user which value is taken.
+        if (err.code === "23505" && err.constraint?.includes("username")) {
+            return sendError(
+                res,
+                409,
+                "USERNAME_TAKEN",
+                "Username is already taken",
+            );
+        }
         if (err.code === "23505") {
             return sendError(
                 res,
@@ -84,9 +103,11 @@ router.post("/register", registerRateLimit, async (req, res) => {
     res.status(201).json({ user: toPublicUser(user) });
 });
 
+// Body: { login, password }, where login is the username or the email.
 router.post("/login", loginRateLimit, async (req, res) => {
-    const { email, password } = readCredentials(req.body);
-    const user = email ? await findUserByEmail(email) : null;
+    const login = cleanText(req.body?.login);
+    const password = readPassword(req.body);
+    const user = login ? await findUserByLogin(login) : null;
     const passwordMatches = await verifyPassword(
         password,
         user?.passwordHash ?? DUMMY_PASSWORD_HASH,
@@ -97,7 +118,7 @@ router.post("/login", loginRateLimit, async (req, res) => {
             res,
             401,
             "INVALID_CREDENTIALS",
-            "Invalid email or password",
+            "Invalid username/email or password",
         );
     }
 

@@ -1,5 +1,5 @@
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
-import { normalizeEmail } from "../utils/email.js";
+import { normalizeLogin } from "../utils/credentials.js";
 import { errorBody } from "../utils/apiError.js";
 
 // Counters are kept in memory: fine for a single server instance, but they
@@ -22,7 +22,8 @@ function limitMessage(code, text) {
 // IPv6 users typically control a whole address block, so ipKeyGenerator
 // counts the block (/56) instead of each single address.
 const ipKey = (req) => ipKeyGenerator(req.ip);
-const emailKey = (req) => normalizeEmail(req.body?.email);
+// The username or email typed into the login field.
+const loginKey = (req) => normalizeLogin(req.body?.login);
 
 const LOGIN_MESSAGE = limitMessage(
     "TOO_MANY_LOGIN_ATTEMPTS",
@@ -43,20 +44,20 @@ function failedLoginLimiter({ windowMs, limit, keyGenerator }) {
 
 // Login is protected by three limits, so a shared IP (NAT: dorms, mobile
 // networks) doesn't get everyone blocked, and nobody can lock out someone
-// else's account just by knowing their email.
+// else's account just by knowing their username or email.
 export const loginRateLimit = [
     // Someone guessing the password of one account. Strict, but per person,
-    // since the key includes the email.
+    // since the key includes the username or email.
     failedLoginLimiter({
         windowMs: 15 * MINUTE,
         limit: 5,
-        keyGenerator: (req) => `${ipKey(req)}|${emailKey(req)}`,
+        keyGenerator: (req) => `${ipKey(req)}|${loginKey(req)}`,
     }),
     // Many machines guessing one account from different IPs.
     failedLoginLimiter({
         windowMs: 60 * MINUTE,
         limit: 20,
-        keyGenerator: emailKey,
+        keyGenerator: loginKey,
     }),
     // One machine trying many accounts. Loose, because many users can
     // share one public IP.
@@ -66,6 +67,21 @@ export const loginRateLimit = [
         keyGenerator: ipKey,
     }),
 ];
+
+// Resizing images is the most expensive thing the server does, so each
+// user gets a limited number of avatar uploads (successful or not).
+// Must come after requireAuth, since it counts per user.
+export const avatarUploadRateLimit = rateLimit({
+    windowMs: 60 * MINUTE,
+    limit: 20,
+    keyGenerator: (req) => `user:${req.user.id}`,
+    message: limitMessage(
+        "TOO_MANY_AVATAR_UPLOADS",
+        "Too many profile picture uploads",
+    ),
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+});
 
 // Stops scripts from creating accounts in bulk, while still allowing a
 // whole class to register from the same university network.

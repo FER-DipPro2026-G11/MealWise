@@ -8,7 +8,7 @@ export function sessionCookieOptions(req) {
         httpOnly: true, // not readable from JavaScript, so XSS can't steal it
         secure: req.secure, // HTTPS-only on Render; plain HTTP works on localhost
         sameSite: "lax", // not sent on cross-site POSTs (CSRF protection)
-        path: "/",
+        path: "/api", // only sent to API routes, not with static files
     };
 }
 

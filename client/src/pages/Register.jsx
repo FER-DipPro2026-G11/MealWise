@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/useAuth";
 import ErrorMessage from "../components/ErrorMessage";
 
-// Must match MIN_PASSWORD_LENGTH in server/src/routes/auth.js
+// Must match server/src/utils/credentials.js
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 30;
 const MIN_PASSWORD_LENGTH = 8;
 
 function Register() {
@@ -17,6 +19,7 @@ function Register() {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         register.mutate({
+            username: form.get("username"),
             email: form.get("email"),
             password: form.get("password"),
         });
@@ -26,6 +29,26 @@ function Register() {
         <div>
             <h1>{t("auth.registerTitle")}</h1>
             <form onSubmit={handleSubmit}>
+                <label>
+                    {t("auth.username")}
+                    <input
+                        type="text"
+                        name="username"
+                        autoComplete="username"
+                        autoCapitalize="none"
+                        minLength={USERNAME_MIN_LENGTH}
+                        maxLength={USERNAME_MAX_LENGTH}
+                        pattern="[A-Za-z0-9_]+"
+                        aria-describedby="username-hint"
+                        required
+                    />
+                </label>
+                <small id="username-hint">
+                    {t("auth.usernameHint", {
+                        min: USERNAME_MIN_LENGTH,
+                        max: USERNAME_MAX_LENGTH,
+                    })}
+                </small>
                 <label>
                     {t("auth.email")}
                     <input

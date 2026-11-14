@@ -8,11 +8,9 @@ const PARAMS = { memory: 19456, passes: 2, parallelism: 1 };
 const SALT_LENGTH = 16;
 const HASH_LENGTH = 32;
 
-// Stored in the standard PHC string format, which other Argon2 libraries
-// understand too:
-//   $argon2id$v=19$m=19456,t=2,p=1$<salt base64>$<hash base64>
-// The parameters are part of the string, so verifying uses whatever a hash
-// was created with, even if PARAMS is changed later.
+// Stored in the standard PHC string format,
+// which other Argon2 libraries understand too:
+// "$argon2id$v=19$m=19456,t=2,p=1$<salt base64>$<hash base64>"
 export async function hashPassword(password) {
     const salt = crypto.randomBytes(SALT_LENGTH);
     const hash = await derive(password, salt, PARAMS, HASH_LENGTH);
@@ -38,7 +36,8 @@ export async function verifyPassword(password, stored) {
         parsed.params,
         parsed.hash.length,
     );
-    // Constant-time comparison, so timing doesn't leak how much matched.
+
+    // constant-time comparison, timing doesn't leak how much matched
     return crypto.timingSafeEqual(actual, parsed.hash);
 }
 

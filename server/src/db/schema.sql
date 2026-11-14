@@ -1,22 +1,16 @@
--- The whole database schema. Edit it directly when the schema changes.
---
--- Applied automatically when the server starts with an empty database.
--- To apply changes to an existing database: `npm run db:reset`
--- (deletes ALL data, then runs this file and seed.sql).
-
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    email TEXT NOT NULL UNIQUE, -- always stored lowercase
+    username TEXT NOT NULL, -- as typed; unique ignoring case (index below)
+    email TEXT NOT NULL, -- as typed; unique ignoring case (index below)
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    avatar BYTEA -- 512x512 WebP with transparency, NULL if none
 );
+CREATE UNIQUE INDEX users_username_lower_idx ON users (lower(username));
+CREATE UNIQUE INDEX users_email_lower_idx ON users (lower(email));
 
--- One row per logged-in browser. The cookie holds a random token; only its
--- SHA-256 hash is stored, so a leaked database can't be used to log in.
 CREATE TABLE sessions (
     token_hash TEXT PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     expires_at TIMESTAMPTZ NOT NULL
 );
 

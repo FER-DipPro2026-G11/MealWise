@@ -8,12 +8,15 @@
     "home": {
         "title": "Home",
         "welcome": "Welcome to MealWise, your meal planning assistant.",
-        "loggedInAs": "Logged in as {{email}}.",
+        "loggedInAs": "Logged in as {{username}}.",
         "logout": "Log out",
         "login": "Log in",
         "register": "Sign up"
     },
     "auth": {
+        "username": "Username",
+        "usernameHint": "{{min}}-{{max}} characters: letters, numbers and underscores",
+        "usernameOrEmail": "Username or email",
         "email": "Email",
         "password": "Password",
         "passwordHint": "At least {{min}} characters",
@@ -28,6 +31,13 @@
         "haveAccount": "Already have an account?",
         "loginLink": "Log in"
     },
+    "avatar": {
+        "alt": "Profile picture",
+        "upload": "Upload picture",
+        "change": "Change picture",
+        "uploading": "Uploading...",
+        "remove": "Remove picture"
+    },
     "notFound": {
         "title": "Page not found",
         "backHome": "Back to home"
@@ -37,13 +47,19 @@
         "minutes_other": "{{count}} minutes"
     },
     "errors": {
+        "INVALID_USERNAME": "Username must be {{min}}-{{max}} characters long and contain only letters, numbers and underscores.",
+        "USERNAME_TAKEN": "This username is already taken.",
         "INVALID_EMAIL": "Please enter a valid email address.",
         "INVALID_PASSWORD_LENGTH": "Password must be between {{min}} and {{max}} characters long.",
         "EMAIL_TAKEN": "This email is already registered.",
-        "INVALID_CREDENTIALS": "Incorrect email or password.",
+        "INVALID_CREDENTIALS": "Incorrect username/email or password.",
         "NOT_AUTHENTICATED": "You are not logged in.",
         "TOO_MANY_LOGIN_ATTEMPTS": "Too many failed login attempts. Try again in $t(time.minutes, {\"count\": {{minutes}} }).",
         "TOO_MANY_REGISTRATIONS": "Too many sign-ups from this network. Try again in $t(time.minutes, {\"count\": {{minutes}} }).",
+        "TOO_MANY_AVATAR_UPLOADS": "Too many picture uploads. Try again in $t(time.minutes, {\"count\": {{minutes}} }).",
+        "IMAGE_TOO_LARGE": "The image is too large. The maximum is {{maxMb}} MB.",
+        "IMAGE_DIMENSIONS_TOO_LARGE": "The image resolution is too high. The maximum is {{maxMegapixels}} megapixels.",
+        "INVALID_IMAGE": "This file isn't a supported image. Use JPEG, PNG, WebP, GIF or AVIF.",
         "NOT_FOUND": "The requested resource was not found.",
         "INVALID_REQUEST": "Invalid request.",
         "SERVER_ERROR": "Something went wrong on the server. Please try again.",

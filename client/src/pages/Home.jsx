@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/useAuth";
 import ErrorMessage from "../components/ErrorMessage";
+import AvatarEditor from "../components/AvatarEditor";
 
 function Home() {
     const { t } = useTranslation();
@@ -15,8 +16,9 @@ function Home() {
                 <p>{t("common.loading")}</p>
             ) : user ? (
                 <>
+                    <AvatarEditor />
                     <p>
-                        {t("home.loggedInAs", { email: user.email })}{" "}
+                        {t("home.loggedInAs", { username: user.username })}{" "}
                         <button
                             onClick={() => logout.mutate()}
                             disabled={logout.isPending}

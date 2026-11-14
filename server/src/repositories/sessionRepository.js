@@ -20,7 +20,7 @@ export async function createSession(userId) {
 
 export async function findUserBySessionToken(token) {
     const { rows } = await query(
-        `SELECT u.id, u.email, u.created_at AS "createdAt"
+        `SELECT u.id, u.username, u.email, u.avatar IS NOT NULL AS "hasAvatar"
          FROM sessions s
          JOIN users u ON u.id = s.user_id
          WHERE s.token_hash = $1 AND s.expires_at > now()`,
