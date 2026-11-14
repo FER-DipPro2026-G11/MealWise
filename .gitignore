@@ -4,3 +4,4 @@ node_modules
 package-lock.json
 dist
 .env
+server/src/db/dumps/

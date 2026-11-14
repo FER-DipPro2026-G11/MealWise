@@ -3,17 +3,23 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "node --watch src/index.js",
-        "start": "node src/index.js",
+        "dev": "node --env-file=../.env --watch src/index.js",
+        "start": "node --env-file-if-exists=../.env src/index.js",
+        "db:reset": "node --env-file-if-exists=../.env src/db/scripts/reset.js",
+        "db:dump": "node --env-file-if-exists=../.env src/db/scripts/dump.js",
+        "db:restore": "node --env-file-if-exists=../.env src/db/scripts/restore.js",
         "lint": "eslint ."
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "eslint": "^10.14.0",
+        "eslint": "^10.15.0",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^17.14.0"
     },
     "dependencies": {
-        "express": "^5.3.0"
+        "cookie-parser": "^1.4.7",
+        "express": "^5.3.0",
+        "express-rate-limit": "^8.7.4",
+        "pg": "^8.23.1"
     }
 }

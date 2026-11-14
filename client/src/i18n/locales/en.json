@@ -1,0 +1,53 @@
+{
+    "common": {
+        "loading": "Loading..."
+    },
+    "language": {
+        "label": "Language"
+    },
+    "home": {
+        "title": "Home",
+        "welcome": "Welcome to MealWise, your meal planning assistant.",
+        "loggedInAs": "Logged in as {{email}}.",
+        "logout": "Log out",
+        "login": "Log in",
+        "register": "Sign up"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "passwordHint": "At least {{min}} characters",
+        "loginTitle": "Log in",
+        "loginButton": "Log in",
+        "loggingIn": "Logging in...",
+        "noAccount": "Don't have an account?",
+        "registerLink": "Sign up",
+        "registerTitle": "Sign up",
+        "registerButton": "Sign up",
+        "registering": "Signing up...",
+        "haveAccount": "Already have an account?",
+        "loginLink": "Log in"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "backHome": "Back to home"
+    },
+    "time": {
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes"
+    },
+    "errors": {
+        "INVALID_EMAIL": "Please enter a valid email address.",
+        "INVALID_PASSWORD_LENGTH": "Password must be between {{min}} and {{max}} characters long.",
+        "EMAIL_TAKEN": "This email is already registered.",
+        "INVALID_CREDENTIALS": "Incorrect email or password.",
+        "NOT_AUTHENTICATED": "You are not logged in.",
+        "TOO_MANY_LOGIN_ATTEMPTS": "Too many failed login attempts. Try again in $t(time.minutes, {\"count\": {{minutes}} }).",
+        "TOO_MANY_REGISTRATIONS": "Too many sign-ups from this network. Try again in $t(time.minutes, {\"count\": {{minutes}} }).",
+        "NOT_FOUND": "The requested resource was not found.",
+        "INVALID_REQUEST": "Invalid request.",
+        "SERVER_ERROR": "Something went wrong on the server. Please try again.",
+        "NETWORK_ERROR": "Can't reach the server. Check your internet connection.",
+        "UNKNOWN": "Something went wrong."
+    }
+}
