@@ -1,9 +1,5 @@
 import express from "express";
-import {
-    SESSION_COOKIE,
-    sessionCookieOptions,
-    requireAuth,
-} from "../middleware/auth.js";
+import { SESSION_COOKIE, sessionCookieOptions } from "../middleware/auth.js";
 import { createUser, findUserByLogin } from "../repositories/userRepository.js";
 import {
     createSession,
@@ -23,16 +19,27 @@ import {
 } from "../utils/credentials.js";
 import { sendError } from "../utils/apiError.js";
 import { toPublicUser } from "../utils/user.js";
-import { loginRateLimit, registerRateLimit } from "../middleware/rateLimit.js";
+import {
+    loginAccountRateLimit,
+    loginIpRateLimit,
+    registerRateLimit,
+} from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
-// Checked against when the user doesn't exist, so a failed login takes the
-// same time either way and doesn't reveal which accounts exist.
 const DUMMY_PASSWORD_HASH = await hashPassword("timing-equalizer");
 
 function readPassword(body) {
     return typeof body?.password === "string" ? body.password : "";
+}
+
+// Looks up the account being logged into (by username or email) once,
+// before the per-account rate limits, which need to know whose account it
+// is. The login handler then uses req.loginUser too.
+async function findLoginUser(req, res, next) {
+    const login = cleanText(req.body?.login);
+    req.loginUser = login ? await findUserByLogin(login) : null;
+    next();
 }
 
 async function startSession(req, res, userId) {
@@ -54,7 +61,7 @@ router.post("/register", registerRateLimit, async (req, res) => {
             res,
             400,
             "INVALID_USERNAME",
-            `Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters: letters, numbers and underscores`,
+            `Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters: English or Croatian letters, numbers and underscores`,
             { min: USERNAME_MIN_LENGTH, max: USERNAME_MAX_LENGTH },
         );
     }
@@ -104,38 +111,40 @@ router.post("/register", registerRateLimit, async (req, res) => {
 });
 
 // Body: { login, password }, where login is the username or the email.
-router.post("/login", loginRateLimit, async (req, res) => {
-    const login = cleanText(req.body?.login);
-    const password = readPassword(req.body);
-    const user = login ? await findUserByLogin(login) : null;
-    const passwordMatches = await verifyPassword(
-        password,
-        user?.passwordHash ?? DUMMY_PASSWORD_HASH,
-    );
-
-    if (!user || !passwordMatches) {
-        return sendError(
-            res,
-            401,
-            "INVALID_CREDENTIALS",
-            "Invalid username/email or password",
+router.post(
+    "/login",
+    loginIpRateLimit,
+    findLoginUser,
+    loginAccountRateLimit,
+    async (req, res) => {
+        const user = req.loginUser;
+        const password = readPassword(req.body);
+        const passwordMatches = await verifyPassword(
+            password,
+            user?.passwordHash ?? DUMMY_PASSWORD_HASH,
         );
-    }
 
-    await deleteExpiredSessions();
-    await startSession(req, res, user.id);
-    res.json({ user: toPublicUser(user) });
-});
+        if (!user || !passwordMatches) {
+            return sendError(
+                res,
+                401,
+                "INVALID_CREDENTIALS",
+                "Invalid username/email or password",
+            );
+        }
+
+        await deleteExpiredSessions();
+
+        await startSession(req, res, user.id);
+        res.json({ user: toPublicUser(user) });
+    },
+);
 
 router.post("/logout", async (req, res) => {
     const token = req.cookies[SESSION_COOKIE];
     if (token) await deleteSession(token);
     res.clearCookie(SESSION_COOKIE, sessionCookieOptions(req));
     res.status(204).end();
-});
-
-router.get("/me", requireAuth, (req, res) => {
-    res.json({ user: toPublicUser(req.user) });
 });
 
 export default router;

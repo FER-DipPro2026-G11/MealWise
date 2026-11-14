@@ -3,10 +3,11 @@
 
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 30;
-// Letters, numbers and underscores only. Never "@", so the login field can
-// tell usernames and emails apart; ASCII only, so no two usernames look the
-// same with different characters (e.g. Latin "a" vs Cyrillic "а").
-const USERNAME_PATTERN = /^[A-Za-z0-9_]+$/;
+// English and Croatian letters, numbers and underscores. Never "@", so the
+// login field can tell usernames and emails apart. Other non-English
+// letters aren't allowed, so no two usernames look the same with different
+// characters (e.g. Latin "a" vs Cyrillic "а").
+const USERNAME_PATTERN = /^[A-Za-z0-9_ČĆĐŠŽčćđšž]+$/;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,8 +16,10 @@ export const PASSWORD_MAX_LENGTH = 200;
 
 // Trimmed string, or "" if the value isn't a string. Usernames and emails
 // are stored like this, as the user typed them.
+// NFC: a letter like "č" can be typed as one character or as "c" plus a
+// separate caron; both look the same, so always store the one-character form.
 export function cleanText(value) {
-    return typeof value === "string" ? value.trim() : "";
+    return typeof value === "string" ? value.trim().normalize("NFC") : "";
 }
 
 // Case-insensitive key for a username or email, e.g. for the rate limiter,

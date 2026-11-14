@@ -1,8 +1,6 @@
 import readline from "node:readline/promises";
 
-// Asks for the database name before anything that deletes data. Locally,
-// DATABASE_URL may point at the production database on Render, so this
-// makes it impossible to wipe it by accident. Returns true if confirmed.
+// Asks for the database name before anything that deletes data.
 export async function confirmDatabaseWipe(whatHappensNext) {
     const url = new URL(process.env.DATABASE_URL);
     const dbName = decodeURIComponent(url.pathname.slice(1));

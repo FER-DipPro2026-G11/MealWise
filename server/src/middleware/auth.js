@@ -12,7 +12,7 @@ export function sessionCookieOptions(req) {
     };
 }
 
-// Runs on every API request: sets req.user to the logged-in user, or null.
+// Loads the logged-in user (if any) into req.user, based on the session cookie.
 export async function loadUser(req, res, next) {
     const token = req.cookies[SESSION_COOKIE];
     req.user = token ? await findUserBySessionToken(token) : null;

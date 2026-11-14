@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { query } from "../db/pool.js";
 
-export const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+export const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function hashToken(token) {
     return crypto.createHash("sha256").update(token).digest("hex");

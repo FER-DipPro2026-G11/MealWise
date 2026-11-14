@@ -15,7 +15,7 @@
     },
     "auth": {
         "username": "Username",
-        "usernameHint": "{{min}}-{{max}} characters: letters, numbers and underscores",
+        "usernameHint": "{{min}}-{{max}} characters: letters (including č, ć, đ, š, ž), numbers and underscores",
         "usernameOrEmail": "Username or email",
         "email": "Email",
         "password": "Password",
@@ -47,7 +47,7 @@
         "minutes_other": "{{count}} minutes"
     },
     "errors": {
-        "INVALID_USERNAME": "Username must be {{min}}-{{max}} characters long and contain only letters, numbers and underscores.",
+        "INVALID_USERNAME": "Username must be {{min}}-{{max}} characters long and contain only letters (including č, ć, đ, š, ž), numbers and underscores.",
         "USERNAME_TAKEN": "This username is already taken.",
         "INVALID_EMAIL": "Please enter a valid email address.",
         "INVALID_PASSWORD_LENGTH": "Password must be between {{min}} and {{max}} characters long.",

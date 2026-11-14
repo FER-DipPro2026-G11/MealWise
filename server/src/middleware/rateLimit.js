@@ -2,8 +2,7 @@ import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { normalizeLogin } from "../utils/credentials.js";
 import { errorBody } from "../utils/apiError.js";
 
-// Counters are kept in memory: fine for a single server instance, but they
-// reset when the server restarts (e.g. Render free tier waking from sleep).
+// counters are kept in memory
 
 const MINUTE = 60 * 1000;
 
@@ -22,8 +21,14 @@ function limitMessage(code, text) {
 // IPv6 users typically control a whole address block, so ipKeyGenerator
 // counts the block (/56) instead of each single address.
 const ipKey = (req) => ipKeyGenerator(req.ip);
-// The username or email typed into the login field.
-const loginKey = (req) => normalizeLogin(req.body?.login);
+
+// The account being logged into. If it exists, its id, so typing the
+// username or the email counts as the same account; otherwise the typed
+// text. req.loginUser is set by the login route before these limits run.
+const accountKey = (req) =>
+    req.loginUser
+        ? `user:${req.loginUser.id}`
+        : `login:${normalizeLogin(req.body?.login)}`;
 
 const LOGIN_MESSAGE = limitMessage(
     "TOO_MANY_LOGIN_ATTEMPTS",
@@ -45,49 +50,37 @@ function failedLoginLimiter({ windowMs, limit, keyGenerator }) {
 // Login is protected by three limits, so a shared IP (NAT: dorms, mobile
 // networks) doesn't get everyone blocked, and nobody can lock out someone
 // else's account just by knowing their username or email.
-export const loginRateLimit = [
+
+// One machine trying many accounts. Loose, because many users can share
+// one public IP. Runs first and needs no database lookup, so a flood from
+// one IP is stopped before it reaches the database.
+export const loginIpRateLimit = failedLoginLimiter({
+    windowMs: 15 * MINUTE,
+    limit: 100,
+    keyGenerator: ipKey,
+});
+
+// Need req.loginUser, so they run after the account lookup.
+export const loginAccountRateLimit = [
     // Someone guessing the password of one account. Strict, but per person,
-    // since the key includes the username or email.
+    // since the key includes the IP.
     failedLoginLimiter({
         windowMs: 15 * MINUTE,
-        limit: 5,
-        keyGenerator: (req) => `${ipKey(req)}|${loginKey(req)}`,
+        limit: 20,
+        keyGenerator: (req) => `${ipKey(req)}|${accountKey(req)}`,
     }),
     // Many machines guessing one account from different IPs.
     failedLoginLimiter({
-        windowMs: 60 * MINUTE,
-        limit: 20,
-        keyGenerator: loginKey,
-    }),
-    // One machine trying many accounts. Loose, because many users can
-    // share one public IP.
-    failedLoginLimiter({
         windowMs: 15 * MINUTE,
-        limit: 50,
-        keyGenerator: ipKey,
+        limit: 100,
+        keyGenerator: accountKey,
     }),
 ];
 
-// Resizing images is the most expensive thing the server does, so each
-// user gets a limited number of avatar uploads (successful or not).
-// Must come after requireAuth, since it counts per user.
-export const avatarUploadRateLimit = rateLimit({
-    windowMs: 60 * MINUTE,
-    limit: 20,
-    keyGenerator: (req) => `user:${req.user.id}`,
-    message: limitMessage(
-        "TOO_MANY_AVATAR_UPLOADS",
-        "Too many profile picture uploads",
-    ),
-    standardHeaders: "draft-8",
-    legacyHeaders: false,
-});
-
-// Stops scripts from creating accounts in bulk, while still allowing a
-// whole class to register from the same university network.
+// Stops scripts from creating accounts in bulk.
 export const registerRateLimit = rateLimit({
     windowMs: 60 * MINUTE,
-    limit: 20,
+    limit: 50,
     keyGenerator: ipKey,
     message: limitMessage(
         "TOO_MANY_REGISTRATIONS",

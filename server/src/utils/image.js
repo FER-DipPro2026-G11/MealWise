@@ -3,10 +3,7 @@ import sharp from "sharp";
 export const AVATAR_SIZE = 512;
 export const MAX_UPLOAD_MB = 20;
 export const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
-// Width x height. Covers full-resolution photos from 48-50 MP phone cameras.
-// Stops "decompression bombs": tiny files that claim huge dimensions and
-// would need gigabytes of memory to decode.
-export const MAX_MEGAPIXELS = 50;
+const MAX_MEGAPIXELS = 50;
 const PROCESSING_TIMEOUT_SECONDS = 15;
 
 // Only let libvips (the library inside sharp) decode the formats browsers
@@ -23,8 +20,6 @@ sharp.unblock({
         "VipsForeignLoadHeifBuffer", // AVIF
     ],
 });
-// Render's free tier has 512 MB of RAM and a fraction of a CPU: don't keep
-// decoded images cached between requests, and use one thread per image.
 sharp.cache(false);
 sharp.concurrency(1);
 

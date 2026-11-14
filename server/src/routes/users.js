@@ -1,6 +1,5 @@
 import express from "express";
 import { requireAuth } from "../middleware/auth.js";
-import { avatarUploadRateLimit } from "../middleware/rateLimit.js";
 import { findAvatar, setAvatar } from "../repositories/userRepository.js";
 import {
     ImageError,
@@ -12,6 +11,11 @@ import { sendError } from "../utils/apiError.js";
 import { toPublicUser } from "../utils/user.js";
 
 const router = express.Router();
+
+// The logged-in user ("me" stands for their id).
+router.get("/me", requireAuth, (req, res) => {
+    res.json({ user: toPublicUser(req.user) });
+});
 
 // The request body is the image file itself (not JSON or a form), with any
 // Content-Type: the real format is detected from the file's contents.
@@ -25,7 +29,6 @@ const readImageBody = express.raw({
 router.put(
     "/me/avatar",
     requireAuth,
-    avatarUploadRateLimit,
     readImageBody,
     async (req, res) => {
         if (!Buffer.isBuffer(req.body) || req.body.length === 0) {

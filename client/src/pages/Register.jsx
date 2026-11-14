@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/useAuth";
 import ErrorMessage from "../components/ErrorMessage";
 
-// Must match server/src/utils/credentials.js
+// Must match server/src/utils/credentials.js (also the pattern below)
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 30;
 const MIN_PASSWORD_LENGTH = 8;
@@ -38,7 +38,7 @@ function Register() {
                         autoCapitalize="none"
                         minLength={USERNAME_MIN_LENGTH}
                         maxLength={USERNAME_MAX_LENGTH}
-                        pattern="[A-Za-z0-9_]+"
+                        pattern="[A-Za-z0-9_ČĆĐŠŽčćđšž]+"
                         aria-describedby="username-hint"
                         required
                     />

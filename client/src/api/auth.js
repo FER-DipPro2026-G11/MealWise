@@ -6,7 +6,7 @@ export const CURRENT_USER_KEY = ["auth", "me"];
 // Returns the user, or null when not logged in (401 is expected, not an error).
 export async function fetchCurrentUser() {
     try {
-        const { user } = await api("/auth/me");
+        const { user } = await api("/users/me");
         return user;
     } catch (err) {
         if (err instanceof ApiError && err.status === 401) return null;
