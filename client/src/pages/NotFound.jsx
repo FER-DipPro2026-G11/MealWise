@@ -1,10 +1,13 @@
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 
 function NotFound() {
+    const { t } = useTranslation();
+
     return (
         <div>
-            <h1>Stranica nije pronađena</h1>
-            <Link to="/">Home</Link>
+            <h1>{t("notFound.title")}</h1>
+            <Link to="/">{t("notFound.backHome")}</Link>
         </div>
     );
 }

@@ -1,0 +1,6 @@
+-- Starting data, inserted right after schema.sql (on an empty database at
+-- server start, and by `npm run db:reset`).
+--
+-- Example:
+--
+-- INSERT INTO categories (name) VALUES ('Breakfast'), ('Lunch'), ('Dinner');

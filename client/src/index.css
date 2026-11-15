@@ -6,3 +6,19 @@ body {
     width: 100vw;
     height: 100vh;
 }
+
+.avatar {
+    display: inline-block;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #d0d7de;
+    color: #333;
+    font-weight: bold;
+    user-select: none;
+}
